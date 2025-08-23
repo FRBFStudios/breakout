@@ -12,6 +12,12 @@ include_directories(include)
 add_executable(breakout
         src/main.cpp
         src/glad.c
+        src/game/Game.cpp
+        src/game/Game.h
+        src/gfx/Shader.cpp
+        src/gfx/Shader.h
+        src/gfx/Texture.cpp
+        src/gfx/Texture.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
