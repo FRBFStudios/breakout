@@ -12,7 +12,7 @@ class Shader {
 public:
 	unsigned int ID;
 
-	Shader();
+	Shader() { };
 
 	Shader &activate();
 
