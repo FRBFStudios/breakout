@@ -8,6 +8,7 @@ enum GameState {
 };
 
 class Game {
+public:
 	GameState state;
 	bool keys[1024];
 	unsigned int width, height;
