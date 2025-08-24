@@ -20,6 +20,8 @@ add_executable(breakout
         src/gfx/Texture.h
         src/gfx/ResourceManager.cpp
         src/gfx/ResourceManager.h
+        src/gfx/stb.cpp
+        src/gfx/stb_image.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
