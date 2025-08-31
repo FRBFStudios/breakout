@@ -24,6 +24,10 @@ add_executable(breakout
         src/gfx/stb_image.h
         src/gfx/SpriteRenderer.cpp
         src/gfx/SpriteRenderer.h
+        src/game/GameLevel.cpp
+        src/game/GameLevel.h
+        src/game/GameObject.cpp
+        src/game/GameObject.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
