@@ -22,6 +22,8 @@ add_executable(breakout
         src/gfx/ResourceManager.h
         src/gfx/stb.cpp
         src/gfx/stb_image.h
+        src/gfx/SpriteRenderer.cpp
+        src/gfx/SpriteRenderer.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")

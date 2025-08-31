@@ -1,6 +1,8 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "../gfx/SpriteRenderer.h"
+
 enum GameState {
 	GAME_ACTIVE,
 	GAME_MENU,
@@ -9,6 +11,7 @@ enum GameState {
 
 class Game {
 public:
+	SpriteRenderer* Renderer;
 	GameState state;
 	bool keys[1024];
 	unsigned int width, height;

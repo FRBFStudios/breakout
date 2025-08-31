@@ -17,6 +17,8 @@ bool testBool = false;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
+glm::mat4 projectionMatrix;
+
 int main() {
 	glfwInit();
 
@@ -59,6 +61,8 @@ int main() {
 
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
+
+	projectionMatrix = glm::ortho(0.0f, static_cast<float>(WIDTH), static_cast<float>(HEIGHT), 0.0f, -1.0f, 1.0f);
 
 	while(!glfwWindowShouldClose(window)) {
 		const auto currentFrame = static_cast<float>(glfwGetTime());
