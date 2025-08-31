@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "../gfx/SpriteRenderer.h"
+#include "GameLevel.h"
 
 enum GameState {
 	GAME_ACTIVE,
@@ -15,13 +16,19 @@ public:
 	GameState state;
 	bool keys[1024];
 	unsigned int width, height;
+	std::vector<GameLevel> Levels;
+	Level activeLevel;
+
 	Game(unsigned int width, unsigned int height);
 	~Game();
+
 	void Init();
+
 	void ProcessInput(float dt);
 	void Update(float dt);
-	void Render();
 	void UpdateDimensions(unsigned int width, unsigned int height);
+
+	void Render();
 };
 
 #endif //GAME_H

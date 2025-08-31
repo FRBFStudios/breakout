@@ -3,6 +3,7 @@
 #include <fstream>
 #include <sstream>
 
+
 void GameLevel::Load(const char *file, unsigned int levelWidth, unsigned int levelHeight) {
     this->Bricks.clear();
 
@@ -38,7 +39,7 @@ void GameLevel::Draw(SpriteRenderer &renderer) {
     }
 }
 
-bool <GameLevel::isCompleted() const {
+bool GameLevel::isCompleted() {
     for (const GameObject &tile : this->Bricks) {
         if (!tile.isSolid && !tile.destroyed) {
             return false;
@@ -71,7 +72,7 @@ void GameLevel::init(std::vector<std::vector<unsigned int>> tileData, unsigned i
                 auto color = glm::vec3(1.0f); // white base color
 
                 switch(tileData[y][x]) {
-                    case BREAKABLE_RED: color = glm::vec3(7.0f, 0.0f, 0.0f); break;
+                    case BREAKABLE_RED: color = glm::vec3(1.0f, 0.0f, 0.0f); break;
                     case BREAKABLE_GREEN: color = glm::vec3(0.0f, 0.7f, 0.0f); break;
                     case BREAKABLE_BLUE: color = glm::vec3(0.2f, 0.6f, 1.0f); break;
                     case BREAKABLE_YELLOW: color = glm::vec3(0.8f, 0.8f, 0.4f); break;

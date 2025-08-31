@@ -24,7 +24,7 @@ Texture ResourceManager::LoadTexture(const char *file, bool alpha, const std::st
     return Textures[name];
 }
 
-Texture ResourceManager::GetTexture(const std::string& name) {
+Texture &ResourceManager::GetTexture(const std::string &name) {
     return Textures[name];
 }
 

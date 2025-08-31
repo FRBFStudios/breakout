@@ -9,6 +9,13 @@
 #include "../src/gfx/SpriteRenderer.h"
 #include "../src/gfx/ResourceManager.h"
 
+enum Level {
+	STANDARD,
+	GAPS,
+	SPACE_INVADER,
+	BOUNCE_GALORE
+};
+
 enum Blocks {
 	AIR,
 	SOLID,
@@ -27,7 +34,7 @@ public:
 	void Load(const char *file, unsigned int levelWidth, unsigned int levelHeight);
 	void Draw(SpriteRenderer &renderer);
 
-	bool isCompleted() const;
+	bool isCompleted();
 
 private:
 	void init(std::vector<std::vector<unsigned int>> tileData, unsigned int levelWidth, unsigned int levelHeight);
