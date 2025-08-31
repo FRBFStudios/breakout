@@ -21,6 +21,7 @@ public:
 	void ProcessInput(float dt);
 	void Update(float dt);
 	void Render();
+	void UpdateDimensions(unsigned int width, unsigned int height);
 };
 
 #endif //GAME_H

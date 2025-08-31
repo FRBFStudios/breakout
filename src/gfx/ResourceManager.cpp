@@ -14,7 +14,7 @@ Shader ResourceManager::LoadShader(const char *vertexShaderFile, const char *fra
     return Shaders[name];
 }
 
-Shader ResourceManager::GetShader(const std::string& name) {
+Shader& ResourceManager::GetShader(const std::string& name) {
     return Shaders[name];
 }
 

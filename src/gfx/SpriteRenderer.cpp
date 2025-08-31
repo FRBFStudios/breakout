@@ -1,18 +1,28 @@
 #include "SpriteRenderer.h"
 
+SpriteRenderer::SpriteRenderer(Shader &shader) {
+	this->shader = shader;
+	this->initRenderData();
+}
+
+SpriteRenderer::~SpriteRenderer() {
+	glDeleteVertexArrays(1, &this->quadVAO);
+}
+
+
 void SpriteRenderer::DrawSprite(Texture &texture, glm::vec2 position, glm::vec2 size, float rotate, glm::vec3 color) {
 	this->shader.activate();
 
-	auto model = glm::mat4(1.0f);
-	model = glm::translate(model, glm::vec3(position, 0.0f));
+	auto modelMatrix = glm::mat4(1.0f);
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(position, 0.0f));
 
-	model = glm::translate(model, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f));
-	model = glm::rotate(model, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f));
-	model = glm::translate(model, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(0.5f * size.x, 0.5f * size.y, 0.0f));
+	modelMatrix = glm::rotate(modelMatrix, glm::radians(rotate), glm::vec3(0.0f, 0.0f, 1.0f));
+	modelMatrix = glm::translate(modelMatrix, glm::vec3(-0.5f * size.x, -0.5f * size.y, 0.0f));
 
-	model = glm::scale(model, glm::vec3(size, 1.0f));
+	modelMatrix = glm::scale(modelMatrix, glm::vec3(size, 1.0f));
 
-	this->shader.setMatrix4("modelMatrix", model);
+	this->shader.setMatrix4("modelMatrix", modelMatrix);
 	this->shader.setVector3f("spriteColor", color);
 
 	glActiveTexture(GL_TEXTURE0);
