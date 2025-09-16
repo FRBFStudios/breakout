@@ -17,7 +17,6 @@ bool testBool = false;
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 
-glm::mat4 projectionMatrix;
 
 int main() {
 	glfwInit();
@@ -62,7 +61,6 @@ int main() {
 	float deltaTime = 0.0f;
 	float lastFrame = 0.0f;
 
-	projectionMatrix = glm::ortho(0.0f, static_cast<float>(WIDTH), static_cast<float>(HEIGHT), 0.0f, -1.0f, 1.0f);
 
 	while(!glfwWindowShouldClose(window)) {
 		const auto currentFrame = static_cast<float>(glfwGetTime());
@@ -72,6 +70,7 @@ int main() {
 
 		Breakout->ProcessInput(deltaTime);
 		Breakout->Update(deltaTime);
+		Breakout->Render();
 
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT);
@@ -80,6 +79,7 @@ int main() {
 		glfwSwapBuffers(window);
 	}
 	ResourceManager::Clear();
+	Breakout->~Game();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
@@ -91,6 +91,7 @@ void framebuffer_size_callback(GLFWwindow *window, int width, int height) {
 	HEIGHT = height;
 
 	glViewport(0, 0, width, height);
+	Breakout->UpdateDimensions(width, height);
 }
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode) {
