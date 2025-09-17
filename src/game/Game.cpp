@@ -9,6 +9,8 @@ Game::Game(unsigned int width, unsigned int height) {
 	this->height = height;
 	this->state = GAME_ACTIVE;
 	this->activeLevel = STANDARD;
+
+	std::fill(std::begin(this->keys), std::end(this->keys), false); // Initialize all keys to false
 }
 
 Game::~Game() {
