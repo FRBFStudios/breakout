@@ -19,6 +19,8 @@ public:
 	std::vector<GameLevel> Levels;
 	Level activeLevel;
 
+	GameObject *Player;
+
 	Game(unsigned int width, unsigned int height);
 	~Game();
 

@@ -28,6 +28,8 @@ add_executable(breakout
         src/game/GameLevel.h
         src/game/GameObject.cpp
         src/game/GameObject.h
+        src/game/Ball.cpp
+        src/game/Ball.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
