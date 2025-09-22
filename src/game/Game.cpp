@@ -3,6 +3,8 @@
 #include "../src/gfx/ResourceManager.h"
 #include "GLFW/glfw3.h"
 
+bool CheckCollision(GameObject &one, GameObject &two);
+bool CheckCollision(BallClass &ball, GameObject &block);
 
 Game::Game(unsigned int width, unsigned int height) {
 	this->width = width;
@@ -17,8 +19,11 @@ Game::~Game() {
 	Renderer->~SpriteRenderer();
 }
 
-const glm::vec2 PLAYER_SIZE(100.0f, 20.0f);
+const glm::vec2 PLAYER_SIZE(150.0f, 30.0f);
 const float PLAYER_VELOCITY(500.0f);
+
+const float BALL_RADIUS = 25.0f;
+const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 
 void Game::Init() {
 	ResourceManager::LoadShader("src/shaders/default.vert", "src/shaders/default.frag", nullptr, "sprite");
@@ -30,7 +35,7 @@ void Game::Init() {
 
 	Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
-	ResourceManager::LoadTexture("resources/textures/awesomeface.png", true, "face");
+	ResourceManager::LoadTexture("resources/textures/awesomeface.png", true, "ball");
 	ResourceManager::LoadTexture("resources/textures/background.jpg", false, "background");
 	ResourceManager::LoadTexture("resources/textures/paddle.png", true, "paddle");
 
@@ -47,7 +52,7 @@ void Game::Init() {
 	this->Levels.push_back(space_invader);
 	this->Levels.push_back(bounce_galore);
 
-	this->activeLevel = SPACE_INVADER	;
+	this->activeLevel = SPACE_INVADER;
 	this->state = GAME_ACTIVE;
 
 	glm::vec2 playerPos = glm::vec2(
@@ -55,6 +60,9 @@ void Game::Init() {
 		this->height - PLAYER_SIZE.y
 	);
 	Player = new GameObject(playerPos, PLAYER_SIZE, ResourceManager::GetTexture("paddle"));
+
+	glm::vec2 ballPos = playerPos + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f);
+	Ball = new BallClass(ballPos, BALL_RADIUS, INITIAL_BALL_VELOCITY, ResourceManager::GetTexture("ball"));
 }
 
 void Game::UpdateDimensions(unsigned int width, unsigned int height) {
@@ -74,19 +82,46 @@ void Game::ProcessInput(float dt) {
 		if(this->keys[GLFW_KEY_A]) {
 			if(Player->position.x >= 0.0f) {
 				Player->position.x -= velocity;
+				if(Ball->stuck) {
+					Ball->position.x -= velocity;
+				}
 			}
 		}
 		if(this->keys[GLFW_KEY_D]) {
 			if(Player->position.x <= this->width - Player->size.x) {
 				Player->position.x += velocity;
+				if(Ball->stuck) {
+					Ball->position.x += velocity;
+				}
 			}
+		}
+		if(this->keys[GLFW_KEY_SPACE]) {
+			Ball->stuck = false;
 		}
 	}
 }
 
 void Game::Update(float dt) {
-
+	Ball->Move(dt, this->width);
+	DoCollisions();
 }
+
+void Game::DoCollisions() {
+	for (GameObject &box : this->Levels[this->activeLevel].Bricks) {
+		if(box.destroyed) {
+			continue;
+		}
+
+		if(CheckCollision(*Ball, box)) {
+			if(!box.isSolid) {
+				box.destroyed = true;
+			} else {
+
+			}
+		}
+	}
+}
+
 
 void Game::Render() {
 	if(this->state == GAME_ACTIVE) {
@@ -94,5 +129,40 @@ void Game::Render() {
 		   glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
 		this->Levels[this->activeLevel].Draw(*Renderer);
 		Player->Draw(*Renderer);
+		Ball->Draw(*Renderer);
 	}
+}
+
+
+bool CheckCollision(GameObject &one, GameObject &two) {
+	bool collisionX = one.position.x + one.size.x >= two.position.x &&
+			two.position.x + two.size.x >= one.position.x;
+
+	bool collisionY = one.position.y + one.size.y >= two.position.y &&
+		two.position.y + two.size.y >= one.position.y;
+
+	return collisionX && collisionY;
+}
+
+bool CheckCollision(BallClass &ball, GameObject &block) {
+	glm::vec2 ball_center(ball.position + ball.radius);
+
+	glm::vec2 block_half_extents(block.size.x / 2.0f, block.size.y / 2.0f);
+	glm::vec2 block_center(
+		block.position.x + block_half_extents.x,
+		block.position.y + block_half_extents.y
+	);
+
+	glm::vec2 difference = ball_center - block_center;
+	glm::vec2 clamped = glm::clamp(difference, -block_half_extents, block_half_extents);
+	glm::vec2 closest = block_center + clamped;
+
+
+	bool collisionX = ball.position.x + ball.size.x >= block.position.x &&
+		block.position.x + block.size.x >= ball.position.x;
+
+	bool collisionY = ball.position.y + ball.size.y >= block.position.y &&
+		block.position.y + block.size.y >= ball.position.y;
+
+	return collisionX && collisionY;
 }

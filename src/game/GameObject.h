@@ -10,6 +10,8 @@
 
 class GameObject {
 public:
+	virtual ~GameObject() = default;
+
 	glm::vec2 position, size, velocity;
 	glm::vec3 color;
 	float rotation;

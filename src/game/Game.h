@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "BallClass.h"
 #include "../gfx/SpriteRenderer.h"
 #include "GameLevel.h"
 
@@ -19,7 +20,8 @@ public:
 	std::vector<GameLevel> Levels;
 	Level activeLevel;
 
-	GameObject *Player;
+	GameObject* Player;
+	BallClass* Ball;
 
 	Game(unsigned int width, unsigned int height);
 	~Game();
@@ -29,6 +31,8 @@ public:
 	void ProcessInput(float dt);
 	void Update(float dt);
 	void UpdateDimensions(unsigned int width, unsigned int height);
+
+	void DoCollisions();
 
 	void Render();
 };
