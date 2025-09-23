@@ -102,7 +102,7 @@ void Game::ProcessInput(float dt) {
 }
 
 void Game::Update(float dt) {
-	Ball->Move(dt, this->width);
+	Ball->Move(dt, this->width, Player->position, PLAYER_SIZE);
 	DoCollisions();
 }
 

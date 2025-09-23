@@ -12,7 +12,7 @@ public:
 	BallClass();
 	BallClass(glm::vec2 position, float radius, glm::vec2 velocity, Texture sprite);
 
-	glm::vec2 Move(float dt, unsigned int window_width);
+	glm::vec2 Move(float dt, unsigned int window_width, glm::vec2 player_position, glm::vec2 player_size);
 
 
 
