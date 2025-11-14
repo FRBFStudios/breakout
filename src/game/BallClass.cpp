@@ -28,13 +28,14 @@ glm::vec2 BallClass::Move(float dt, unsigned int window_width, glm::vec2 player_
 			this->position = player_position + glm::vec2(player_size.x / 2.0f - this->radius, -this->radius * 2.0f);
 		}
 
+		/*
 		if(this->position.y + (this->radius * 2) >= player_position.y && (this->position.x >= player_position.x && this->position.x <= player_position.x + player_size.x)) {
 			this->velocity.y = -this->velocity.y;
 			const float directionMultiplier = (this->velocity.x >= 0)? 1 : -1;
 
 			this->velocity.x = directionMultiplier * 10.0f * std::abs((this->position.x + this->radius) - (player_position.x + (player_size.x / 2)));
 			this->position.y = player_position.y - (this->radius * 2);
-		}
+		}*/
 	}
 	return this->position;
 }
@@ -43,4 +44,3 @@ void BallClass::Reset(glm::vec2 position, glm::vec2 velocity) {
 	this->position = position;
 	this->velocity = velocity;
 }
-

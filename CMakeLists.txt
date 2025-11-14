@@ -30,6 +30,8 @@ add_executable(breakout
         src/game/GameObject.h
         src/game/BallClass.cpp
         src/game/BallClass.h
+        src/gfx/ParticleGenerator.cpp
+        src/gfx/ParticleGenerator.h
 )
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")

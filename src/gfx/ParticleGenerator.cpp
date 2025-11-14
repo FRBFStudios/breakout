@@ -1,0 +1,83 @@
+#include "ParticleGenerator.h"
+
+ParticleGenerator::ParticleGenerator(Shader shader, Texture texture, unsigned int amount)
+		: amount(amount), shader(shader), texture(texture) {
+	this->init();
+}
+
+void ParticleGenerator::init() {
+	unsigned int VBO;
+	float square_vertices[] ={
+		0.0f, 0.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 0.0f,
+		0.0f, 1.0f,
+		1.0f, 1.0f
+	};
+
+	for(int i = 0; i < this->amount; i++) {
+		this->particles.push_back(Particle());
+	}
+}
+
+unsigned int nrNewParticles = 2;
+void ParticleGenerator::Update(float dt, GameObject &object, unsigned int newParticles, glm::vec2 offset) {
+	for(unsigned int i = 0; i < nrNewParticles; i++) {
+		this->respawnParticle(particles[this->firstUnusedParticle()], object, offset);
+	}
+
+	for(unsigned int i = 0; i < this->amount; i++) {
+		Particle &p = this->particles[i];
+		p.lifetime -= dt;
+		if(p.lifetime > 0.0f) {
+			p.position -= p.velocity * dt;
+			p.color.a -= dt * 2.5f;
+		}
+	}
+}
+
+unsigned int lastUsedParticle = 0;
+unsigned int ParticleGenerator::firstUnusedParticle() const {
+	for(unsigned int i = lastUsedParticle; i < this->amount; i++) {
+		if(particles[i].lifetime <= 0.0f) {
+			lastUsedParticle = i;
+			return i;
+		}
+	}
+
+	for(unsigned int i = 0; i < lastUsedParticle; i++) {
+		if(particles[i].lifetime <= 0.0f) {
+			lastUsedParticle = i;
+			return i;
+		}
+	}
+
+	lastUsedParticle = 0;
+	return 0;
+}
+
+void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, auto offset) {
+	float random = ((rand() % 100) - 50) / 10.0f;
+	float rColor = 0.5f + ((rand() % 100) / 100.0f);
+	particle.position = object.position + random + offset;
+	particle.color = glm::vec4(rColor, rColor, rColor, 1);
+	particle.lifetime = 1.0f;
+	particle.velocity = object.velocity * 0.1f;
+}
+
+void ParticleGenerator::Draw() {
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	this->shader.activate();
+
+	for(Particle particle : this->particles) {
+		if(particle.lifetime > 0.0f) {
+			shader.setVector2f("offset", particle.position);
+			shader.setVector4f("color", particle.color);
+			this->texture.bind();
+			glBindVertexArray(VAO);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindVertexArray(0);
+		}
+	}
+}

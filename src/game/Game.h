@@ -5,11 +5,22 @@
 #include "../gfx/SpriteRenderer.h"
 #include "GameLevel.h"
 
+class ParticleGenerator;
+
 enum GameState {
 	GAME_ACTIVE,
 	GAME_MENU,
 	GAME_WIN
 };
+
+enum Direction {
+	UP,
+	RIGHT,
+	DOWN,
+	LEFT
+};
+
+typedef std::tuple<bool, Direction, glm::vec2> Collision;
 
 class Game {
 public:
@@ -22,6 +33,7 @@ public:
 
 	GameObject* Player;
 	BallClass* Ball;
+	ParticleGenerator *Particles;
 
 	Game(unsigned int width, unsigned int height);
 	~Game();
@@ -35,6 +47,13 @@ public:
 	void DoCollisions();
 
 	void Render();
+
+	static Direction VectorDirection(glm::vec2 target);
+	static bool CheckCollision(GameObject &one, GameObject &two);
+	static Collision CheckCollision(BallClass &ball, GameObject &block);
+
+	void resetLevel();
+	void resetPlayer();
 };
 
 #endif //GAME_H

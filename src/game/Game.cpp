@@ -1,10 +1,9 @@
 #include "Game.h"
 
+#include "../gfx/ParticleGenerator.h"
 #include "../src/gfx/ResourceManager.h"
 #include "GLFW/glfw3.h"
 
-bool CheckCollision(GameObject &one, GameObject &two);
-bool CheckCollision(BallClass &ball, GameObject &block);
 
 Game::Game(unsigned int width, unsigned int height) {
 	this->width = width;
@@ -27,6 +26,7 @@ const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 
 void Game::Init() {
 	ResourceManager::LoadShader("src/shaders/default.vert", "src/shaders/default.frag", nullptr, "sprite");
+	ResourceManager::LoadShader("src/shaders/particle.vert", "src/shaders/particle.frag", nullptr, "particle");
 
 	glm::mat4 projectionMatrix = glm::ortho(0.0f, static_cast<float>(this->width),
 		static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
@@ -42,6 +42,12 @@ void Game::Init() {
 	ResourceManager::LoadTexture("resources/textures/block.png", false, "block");
 	ResourceManager::LoadTexture("resources/textures/block_solid.png", false, "block_solid");
 
+	Particles = new ParticleGenerator (
+		ResourceManager::GetShader("particle"),
+		ResourceManager::LoadTexture("textures/awesomeface.png", true, "particle"),
+		500
+		);
+
 	GameLevel standard; standard.Load("resources/levels/standard.lvl", this->width, this->height / 2);
 	GameLevel gaps; gaps.Load("resources/levels/gaps.lvl", this->width, this->height / 2);
 	GameLevel space_invader; space_invader.Load("resources/levels/space_invader.lvl", this->width, this->height / 2);
@@ -52,7 +58,7 @@ void Game::Init() {
 	this->Levels.push_back(space_invader);
 	this->Levels.push_back(bounce_galore);
 
-	this->activeLevel = SPACE_INVADER;
+	this->activeLevel = STANDARD;
 	this->state = GAME_ACTIVE;
 
 	glm::vec2 playerPos = glm::vec2(
@@ -104,22 +110,83 @@ void Game::ProcessInput(float dt) {
 void Game::Update(float dt) {
 	Ball->Move(dt, this->width, Player->position, PLAYER_SIZE);
 	DoCollisions();
+	Particles->Update(dt, *Ball, 2, glm::vec2 (Ball->radius));
+
+	if (Ball->position.y >= this->height) {
+		resetLevel();
+		resetPlayer();
+	}
 }
 
 void Game::DoCollisions() {
 	for (GameObject &box : this->Levels[this->activeLevel].Bricks) {
-		if(box.destroyed) {
-			continue;
-		}
+		if (!box.destroyed) {
+			Collision collision = CheckCollision(*Ball, box);
+			if (std::get<0>(collision)) {
 
-		if(CheckCollision(*Ball, box)) {
-			if(!box.isSolid) {
-				box.destroyed = true;
-			} else {
+				if (!box.isSolid) {
+					box.destroyed = true;
+				}
 
+				Direction direction = std::get<1>(collision);
+				glm::vec2 diff_vector = std::get<2>(collision);
+
+				if (direction == LEFT || direction == RIGHT) {
+					Ball->velocity.x = -Ball->velocity.x;
+					float penetration = Ball->radius - std::abs(diff_vector.x);
+					if (direction == LEFT) {
+						Ball->position.x += penetration;
+					}
+					else {
+						Ball->position.x -= penetration;
+					}
+				}
+				else {
+					Ball->velocity.y = -Ball->velocity.y;
+
+					float penetration = Ball->radius - std::abs(diff_vector.y);
+					if (direction == UP) {
+						Ball->position.y -= penetration;
+					}
+					else {
+						Ball->position.y += penetration;
+					}
+				}
 			}
 		}
 	}
+
+	Collision result = CheckCollision(*Ball, *Player);
+	if(!Ball->stuck && std::get<0>(result)) {
+		float centerBoard = Player->position.x + Player->size.x / 2.0;
+		float distance = (Ball->position.x + Ball->radius) - centerBoard;
+		float percentage = distance / (Player->size.x / 2.0f);
+
+		float strength = 2.0f;
+		glm::vec2 oldVelocity = Ball->velocity;
+		Ball->velocity.x = INITIAL_BALL_VELOCITY.x * percentage * strength;
+		Ball->velocity.y = -1 * std::abs(Ball->velocity.y);
+		Ball->velocity = glm::normalize(Ball->velocity) * glm::length(oldVelocity);
+	}
+}
+
+Direction Game::VectorDirection(glm::vec2 target) {
+	glm::vec2 compass[] = {
+		glm::vec2(0.0f, 1.0f),	// up
+		glm::vec2(1.0f, 0.0f),	// right
+		glm::vec2(0.0f, -1.0f),	// down
+		glm::vec2(-1.0f, 0.0f)	// left
+	};
+	float max = 0.0f;
+	unsigned int best_match = -1;
+	for(unsigned int i = 0; i < 4; i++) {
+		float dot_product = glm::dot(glm::normalize(target), compass[i]);
+		if(dot_product > max) {
+			max = dot_product;
+			best_match = i;
+		}
+	}
+	return static_cast<Direction>(best_match);
 }
 
 
@@ -129,12 +196,13 @@ void Game::Render() {
 		   glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
 		this->Levels[this->activeLevel].Draw(*Renderer);
 		Player->Draw(*Renderer);
+		Particles->Draw();
 		Ball->Draw(*Renderer);
 	}
 }
 
 
-bool CheckCollision(GameObject &one, GameObject &two) {
+bool Game::CheckCollision(GameObject &one, GameObject &two) {
 	bool collisionX = one.position.x + one.size.x >= two.position.x &&
 			two.position.x + two.size.x >= one.position.x;
 
@@ -144,8 +212,8 @@ bool CheckCollision(GameObject &one, GameObject &two) {
 	return collisionX && collisionY;
 }
 
-bool CheckCollision(BallClass &ball, GameObject &block) {
-	glm::vec2 ball_center(ball.position + ball.radius);
+Collision Game::CheckCollision(BallClass &ball, GameObject &block) {
+	glm::vec2 center(ball.position + ball.radius);
 
 	glm::vec2 block_half_extents(block.size.x / 2.0f, block.size.y / 2.0f);
 	glm::vec2 block_center(
@@ -153,16 +221,45 @@ bool CheckCollision(BallClass &ball, GameObject &block) {
 		block.position.y + block_half_extents.y
 	);
 
-	glm::vec2 difference = ball_center - block_center;
+	glm::vec2 difference = center - block_center;
 	glm::vec2 clamped = glm::clamp(difference, -block_half_extents, block_half_extents);
+
 	glm::vec2 closest = block_center + clamped;
 
+	difference = closest - center;
 
-	bool collisionX = ball.position.x + ball.size.x >= block.position.x &&
-		block.position.x + block.size.x >= ball.position.x;
+	if(glm::length(difference) <= ball.radius) {
+		return std::make_tuple(true, VectorDirection(difference), difference);
+	}
+	else {
+		return std::make_tuple(false, UP, glm::vec2(0.0f, 0.0f));
+	}
+}
 
-	bool collisionY = ball.position.y + ball.size.y >= block.position.y &&
-		block.position.y + block.size.y >= ball.position.y;
+void Game::resetLevel() {
+	if(this->activeLevel == STANDARD) {
+		this->Levels[STANDARD].Load("resources/levels/standard.lvl", this->width, this->height / 2);
+	}
+	else if(this->activeLevel == GAPS) {
+		this->Levels[GAPS].Load("resources/levels/gaps.lvl", this->width, this->height / 2);
+	}
+	else if(this->activeLevel == SPACE_INVADER) {
+		this->Levels[SPACE_INVADER].Load("resources/levels/space_invader.lvl", this->width, this->height / 2);
+	}
+	else if(this->activeLevel == BOUNCE_GALORE) {
+		this->Levels[BOUNCE_GALORE].Load("resources/levels/bounce_galore.lvl", this->width, this->height / 2);
+	} else {
+		this->Levels[STANDARD].Load("resources/levels/standard.lvl", this->width, this->height / 2);
+	}
+}
 
-	return collisionX && collisionY;
+void Game::resetPlayer() {
+	Player->position = glm::vec2(
+		this->width / 2.0f - PLAYER_SIZE.x / 2.0f,
+		this->height - PLAYER_SIZE.y
+	);
+	Ball->Reset(
+		Player->position + glm::vec2(PLAYER_SIZE.x / 2.0f - BALL_RADIUS, -BALL_RADIUS * 2.0f),
+		INITIAL_BALL_VELOCITY
+	);
 }
