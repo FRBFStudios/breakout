@@ -32,8 +32,8 @@ private:
 	unsigned int VAO;
 
 	void init();
-	unsigned int firstUnusedParticle() const;
-	void respawnParticle(Particle &particle, GameObject &object, auto offset = glm::vec2(0.0f, 0.0f));
+	unsigned int firstUnusedParticle();
+	void respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset = glm::vec2(0.0f, 0.0f));
 };
 
 #endif //PARTICLEGENERATOR_H

@@ -29,7 +29,7 @@ void Game::Init() {
 	ResourceManager::LoadShader("src/shaders/particle.vert", "src/shaders/particle.frag", nullptr, "particle");
 
 	glm::mat4 projectionMatrix = glm::ortho(0.0f, static_cast<float>(this->width),
-		static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
+			static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
 	ResourceManager::GetShader("sprite").activate().setInteger("image", 0);
 	ResourceManager::GetShader("sprite").setMatrix4("projectionMatrix", projectionMatrix);
 
@@ -44,7 +44,7 @@ void Game::Init() {
 
 	Particles = new ParticleGenerator (
 		ResourceManager::GetShader("particle"),
-		ResourceManager::LoadTexture("textures/awesomeface.png", true, "particle"),
+		ResourceManager::GetTexture("ball"),
 		500
 		);
 
@@ -58,7 +58,7 @@ void Game::Init() {
 	this->Levels.push_back(space_invader);
 	this->Levels.push_back(bounce_galore);
 
-	this->activeLevel = STANDARD;
+	this->activeLevel = SPACE_INVADER;
 	this->state = GAME_ACTIVE;
 
 	glm::vec2 playerPos = glm::vec2(
@@ -110,7 +110,7 @@ void Game::ProcessInput(float dt) {
 void Game::Update(float dt) {
 	Ball->Move(dt, this->width, Player->position, PLAYER_SIZE);
 	DoCollisions();
-	Particles->Update(dt, *Ball, 2, glm::vec2 (Ball->radius));
+	//Particles->Update(dt, *Ball, 2, glm::vec2 (Ball->radius / 2.0f));
 
 	if (Ball->position.y >= this->height) {
 		resetLevel();
@@ -196,7 +196,7 @@ void Game::Render() {
 		   glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
 		this->Levels[this->activeLevel].Draw(*Renderer);
 		Player->Draw(*Renderer);
-		Particles->Draw();
+		//Particles->Draw();
 		Ball->Draw(*Renderer);
 	}
 }

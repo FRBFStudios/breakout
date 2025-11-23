@@ -8,13 +8,25 @@ ParticleGenerator::ParticleGenerator(Shader shader, Texture texture, unsigned in
 void ParticleGenerator::init() {
 	unsigned int VBO;
 	float square_vertices[] ={
-		0.0f, 0.0f,
-		1.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 1.0f
+		0.0f, 1.0f, 0.0f, 1.0f,
+		1.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 0.0f,
+
+		0.0f, 1.0f, 0.0f, 1.0f,
+		1.0f, 1.0f, 1.0f, 1.0f,
+		1.0f, 0.0f, 1.0f, 0.0f
 	};
+
+	glGenVertexArrays(1, &this->VAO);
+	glGenBuffers(1, &VBO);
+	glBindVertexArray(this->VAO);
+
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(square_vertices), square_vertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof(float), static_cast<void *>(nullptr));
+	glBindVertexArray(0);
 
 	for(int i = 0; i < this->amount; i++) {
 		this->particles.push_back(Particle());
@@ -38,16 +50,16 @@ void ParticleGenerator::Update(float dt, GameObject &object, unsigned int newPar
 }
 
 unsigned int lastUsedParticle = 0;
-unsigned int ParticleGenerator::firstUnusedParticle() const {
+unsigned int ParticleGenerator::firstUnusedParticle() {
 	for(unsigned int i = lastUsedParticle; i < this->amount; i++) {
-		if(particles[i].lifetime <= 0.0f) {
+		if(this->particles[i].lifetime <= 0.0f) {
 			lastUsedParticle = i;
 			return i;
 		}
 	}
 
 	for(unsigned int i = 0; i < lastUsedParticle; i++) {
-		if(particles[i].lifetime <= 0.0f) {
+		if(this->particles[i].lifetime <= 0.0f) {
 			lastUsedParticle = i;
 			return i;
 		}
@@ -57,11 +69,12 @@ unsigned int ParticleGenerator::firstUnusedParticle() const {
 	return 0;
 }
 
-void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, auto offset) {
+
+void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset) {
 	float random = ((rand() % 100) - 50) / 10.0f;
 	float rColor = 0.5f + ((rand() % 100) / 100.0f);
 	particle.position = object.position + random + offset;
-	particle.color = glm::vec4(rColor, rColor, rColor, 1);
+	particle.color = glm::vec4(rColor, rColor, rColor, 1.0f);
 	particle.lifetime = 1.0f;
 	particle.velocity = object.velocity * 0.1f;
 }
@@ -75,7 +88,7 @@ void ParticleGenerator::Draw() {
 			shader.setVector2f("offset", particle.position);
 			shader.setVector4f("color", particle.color);
 			this->texture.bind();
-			glBindVertexArray(VAO);
+			glBindVertexArray(this->VAO);
 			glDrawArrays(GL_TRIANGLES, 0, 6);
 			glBindVertexArray(0);
 		}
