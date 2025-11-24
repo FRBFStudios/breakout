@@ -32,6 +32,8 @@ void Game::Init() {
 			static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
 	ResourceManager::GetShader("sprite").activate().setInteger("image", 0);
 	ResourceManager::GetShader("sprite").setMatrix4("projectionMatrix", projectionMatrix);
+	ResourceManager::GetShader("particle").activate().setInteger("particleTexture", 0);
+	ResourceManager::GetShader("particle").setMatrix4("projectionMatrix", projectionMatrix);
 
 	Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
@@ -109,8 +111,8 @@ void Game::ProcessInput(float dt) {
 
 void Game::Update(float dt) {
 	Ball->Move(dt, this->width, Player->position, PLAYER_SIZE);
-	DoCollisions();
-	//Particles->Update(dt, *Ball, 2, glm::vec2 (Ball->radius / 2.0f));
+	this->DoCollisions();
+	Particles->Update(dt, *Ball, 2, glm::vec2 (Ball->radius / 2.0f));
 
 	if (Ball->position.y >= this->height) {
 		resetLevel();
@@ -196,7 +198,7 @@ void Game::Render() {
 		   glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
 		this->Levels[this->activeLevel].Draw(*Renderer);
 		Player->Draw(*Renderer);
-		//Particles->Draw();
+		Particles->Draw();
 		Ball->Draw(*Renderer);
 	}
 }

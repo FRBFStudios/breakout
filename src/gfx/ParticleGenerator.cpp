@@ -33,9 +33,9 @@ void ParticleGenerator::init() {
 	}
 }
 
-unsigned int nrNewParticles = 2;
+
 void ParticleGenerator::Update(float dt, GameObject &object, unsigned int newParticles, glm::vec2 offset) {
-	for(unsigned int i = 0; i < nrNewParticles; i++) {
+	for(unsigned int i = 0; i < newParticles; i++) {
 		this->respawnParticle(particles[this->firstUnusedParticle()], object, offset);
 	}
 
@@ -93,4 +93,5 @@ void ParticleGenerator::Draw() {
 			glBindVertexArray(0);
 		}
 	}
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
