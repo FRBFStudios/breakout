@@ -18,7 +18,7 @@ struct Particle {
 
 class ParticleGenerator {
 public:
-	ParticleGenerator(Shader shader, Texture texture, unsigned int amount);
+	ParticleGenerator(Shader shader, Texture texture, unsigned int amount, float lifetime);
 
 	void Update(float dt, GameObject &object, unsigned int newParticles, glm::vec2 offset = glm::vec2(0.0f, 0.0f));
 	void Draw();
@@ -26,6 +26,7 @@ public:
 private:
 	std::vector<Particle> particles;
 	unsigned int amount;
+	float lifetime;
 
 	Shader shader;
 	Texture texture;

@@ -47,7 +47,8 @@ void Game::Init() {
 	Particles = new ParticleGenerator (
 		ResourceManager::GetShader("particle"),
 		ResourceManager::GetTexture("ball"),
-		500
+		500,
+		1.0f
 		);
 
 	GameLevel standard; standard.Load("resources/levels/standard.lvl", this->width, this->height / 2);

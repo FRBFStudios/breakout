@@ -1,7 +1,7 @@
 #include "ParticleGenerator.h"
 
-ParticleGenerator::ParticleGenerator(Shader shader, Texture texture, unsigned int amount)
-		: amount(amount), shader(shader), texture(texture) {
+ParticleGenerator::ParticleGenerator(Shader shader, Texture texture, unsigned int amount, float lifetime)
+		: amount(amount), shader(shader), texture(texture), lifetime(lifetime) {
 	this->init();
 }
 
@@ -44,7 +44,7 @@ void ParticleGenerator::Update(float dt, GameObject &object, unsigned int newPar
 		p.lifetime -= dt;
 		if(p.lifetime > 0.0f) {
 			p.position -= p.velocity * dt;
-			p.color.a -= dt * 2.5f;
+			p.color.a = p.lifetime / this->lifetime;
 		}
 	}
 }
@@ -72,10 +72,13 @@ unsigned int ParticleGenerator::firstUnusedParticle() {
 
 void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset) {
 	float random = ((rand() % 100) - 50) / 10.0f;
-	float rColor = 0.5f + ((rand() % 100) / 100.0f);
+	float rColorR = 0.5f + ((rand() % 100) / 100.0f);
+	float rColorG = 0.5f + ((rand() % 100) / 100.0f);
+	float rColorB = 0.5f + ((rand() % 100) / 100.0f);
+
 	particle.position = object.position + random + offset;
-	particle.color = glm::vec4(rColor, rColor, rColor, 1.0f);
-	particle.lifetime = 1.0f;
+	particle.color = glm::vec4(rColorR, rColorG, rColorB, 1.0f);
+	particle.lifetime = this->lifetime;
 	particle.velocity = object.velocity * 0.1f;
 }
 
