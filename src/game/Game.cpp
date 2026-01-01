@@ -25,15 +25,19 @@ const float BALL_RADIUS = 25.0f;
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 
 void Game::Init() {
-	ResourceManager::LoadShader("src/shaders/default.vert", "src/shaders/default.frag", nullptr, "sprite");
-	ResourceManager::LoadShader("src/shaders/particle.vert", "src/shaders/particle.frag", nullptr, "particle");
+	ResourceManager::LoadShader("src/shaders/default.vert", "src/shaders/default.frag",
+		nullptr, "sprite");
+	ResourceManager::LoadShader("src/shaders/particle.vert", "src/shaders/particle.frag",
+		nullptr, "defaultParticleShader");
 
 	glm::mat4 projectionMatrix = glm::ortho(0.0f, static_cast<float>(this->width),
 			static_cast<float>(this->height), 0.0f, -1.0f, 1.0f);
+
 	ResourceManager::GetShader("sprite").activate().setInteger("image", 0);
 	ResourceManager::GetShader("sprite").setMatrix4("projectionMatrix", projectionMatrix);
-	ResourceManager::GetShader("particle").activate().setInteger("particleTexture", 0);
-	ResourceManager::GetShader("particle").setMatrix4("projectionMatrix", projectionMatrix);
+
+	ResourceManager::GetShader("defaultParticleShader").activate().setInteger("particleTexture", 0);
+	ResourceManager::GetShader("defaultParticleShader").setMatrix4("projectionMatrix", projectionMatrix);
 
 	Renderer = new SpriteRenderer(ResourceManager::GetShader("sprite"));
 
@@ -44,12 +48,13 @@ void Game::Init() {
 	ResourceManager::LoadTexture("resources/textures/block.png", false, "block");
 	ResourceManager::LoadTexture("resources/textures/block_solid.png", false, "block_solid");
 
-	Particles = new ParticleGenerator (
-		ResourceManager::GetShader("particle"),
-		ResourceManager::GetTexture("ball"),
-		500,
-		1.0f
-		);
+	BallTrail = new ParticleGenerator (250);
+	BallTrail->SetShader(ResourceManager::GetShader("defaultParticleShader"));
+	BallTrail->SetTexture(ResourceManager::GetTexture("ball"));
+
+	BallTrail->SetLifetime(1.0f);
+	BallTrail->SetPositionSpread(200);
+
 
 	GameLevel standard; standard.Load("resources/levels/standard.lvl", this->width, this->height / 2);
 	GameLevel gaps; gaps.Load("resources/levels/gaps.lvl", this->width, this->height / 2);
@@ -113,7 +118,7 @@ void Game::ProcessInput(float dt) {
 void Game::Update(float dt) {
 	Ball->Move(dt, this->width, Player->position, PLAYER_SIZE);
 	this->DoCollisions();
-	Particles->Update(dt, *Ball, 2, glm::vec2 (Ball->radius / 2.0f));
+	BallTrail->Update(dt, *Ball, 2, glm::vec2(Ball->radius));
 
 	if (Ball->position.y >= this->height) {
 		resetLevel();
@@ -199,7 +204,8 @@ void Game::Render() {
 		   glm::vec2(0.0f, 0.0f), glm::vec2(this->width, this->height), 0.0f);
 		this->Levels[this->activeLevel].Draw(*Renderer);
 		Player->Draw(*Renderer);
-		Particles->Draw();
+
+		BallTrail->Draw();
 		Ball->Draw(*Renderer);
 	}
 }

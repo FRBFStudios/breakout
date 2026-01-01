@@ -33,7 +33,7 @@ public:
 
 	GameObject* Player;
 	BallClass* Ball;
-	ParticleGenerator *Particles;
+	ParticleGenerator *BallTrail;
 
 	Game(unsigned int width, unsigned int height);
 	~Game();

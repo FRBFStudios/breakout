@@ -1,21 +1,25 @@
 #include "ParticleGenerator.h"
+#include <random>
+#include <iostream>
 
-ParticleGenerator::ParticleGenerator(Shader shader, Texture texture, unsigned int amount, float lifetime)
-		: amount(amount), shader(shader), texture(texture), lifetime(lifetime) {
+ParticleGenerator::ParticleGenerator(unsigned int amount) {
+	this->amount = amount;
+	lifetime = 1.0f;
 	this->init();
 }
 
 void ParticleGenerator::init() {
 	unsigned int VBO;
 	float square_vertices[] ={
-		0.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 0.0f,
+		-0.5f, 0.5f, 0.0f, 1.0f,
+		0.5f, -0.5f, 1.0f, 0.0f,
+		-0.5f, -0.5f, 0.0f, 0.0f,
 
-		0.0f, 1.0f, 0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f, 0.0f
+		-0.5f, 0.5f, 0.0f, 1.0f,
+		0.5f, 0.5f, 1.0f, 1.0f,
+		0.5f, -0.5f, 1.0f, 0.0f
 	};
+
 
 	glGenVertexArrays(1, &this->VAO);
 	glGenBuffers(1, &VBO);
@@ -43,6 +47,7 @@ void ParticleGenerator::Update(float dt, GameObject &object, unsigned int newPar
 		Particle &p = this->particles[i];
 		p.lifetime -= dt;
 		if(p.lifetime > 0.0f) {
+			p.velocity = object.velocity * 0.1f;
 			p.position -= p.velocity * dt;
 			p.color.a = p.lifetime / this->lifetime;
 		}
@@ -71,12 +76,27 @@ unsigned int ParticleGenerator::firstUnusedParticle() {
 
 
 void ParticleGenerator::respawnParticle(Particle &particle, GameObject &object, glm::vec2 offset) {
-	float random = ((rand() % 100) - 50) / 10.0f;
-	float rColorR = 0.5f + ((rand() % 100) / 100.0f);
-	float rColorG = 0.5f + ((rand() % 100) / 100.0f);
-	float rColorB = 0.5f + ((rand() % 100) / 100.0f);
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> distr(0, 1);
 
-	particle.position = object.position + random + offset;
+	float randomX = ((rand() % positionSpread) - 50) / 10.0f;
+	float randomY = ((rand() % positionSpread) - 50) / 10.0f;
+
+	if(distr(gen) == 0) {
+		randomX = randomX * -1;
+	}
+
+	if(distr(gen) == 0) {
+		randomY = randomY * -1;
+	}
+
+
+	float rColorR = 0.5f + ((rand() % 1) / 100.0f);
+	float rColorG = 0.5f + ((rand() % 1000) / 100.0f);
+	float rColorB = 0.5f + ((rand() % 1) / 100.0f);
+
+	particle.position = object.position + glm::vec2(randomX, randomY) + offset;
 	particle.color = glm::vec4(rColorR, rColorG, rColorB, 1.0f);
 	particle.lifetime = this->lifetime;
 	particle.velocity = object.velocity * 0.1f;
@@ -97,4 +117,20 @@ void ParticleGenerator::Draw() {
 		}
 	}
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+}
+
+void ParticleGenerator::SetTexture(const Texture &texture) {
+	this->texture = texture;
+}
+
+void ParticleGenerator::SetShader(const Shader shader) {
+	this->shader = shader;
+}
+
+void ParticleGenerator::SetLifetime(float lifetime) {
+	this->lifetime = lifetime;
+}
+
+void ParticleGenerator::SetPositionSpread(int positionSpread) {
+	this->positionSpread = positionSpread;
 }
