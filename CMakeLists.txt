@@ -3,36 +3,15 @@ project(breakout)
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(OpenGL_GL_PREFERENCE GLVND)
-
-find_package(OpenGL REQUIRED)
-
-include_directories(include)
+add_subdirectory(caffeine-gl)
 
 add_executable(breakout
         src/main.cpp
-        src/glad.c
-        src/game/Game.cpp
-        src/game/Game.h
-        src/gfx/Shader.cpp
-        src/gfx/Shader.h
-        src/gfx/Texture.cpp
-        src/gfx/Texture.h
-        src/gfx/ResourceManager.cpp
-        src/gfx/ResourceManager.h
-        src/gfx/stb.cpp
-        src/gfx/stb_image.h
-        src/gfx/SpriteRenderer.cpp
-        src/gfx/SpriteRenderer.h
-        src/game/GameLevel.cpp
-        src/game/GameLevel.h
-        src/game/GameObject.cpp
-        src/game/GameObject.h
-        src/game/BallClass.cpp
-        src/game/BallClass.h
-        src/gfx/ParticleGenerator.cpp
-        src/gfx/ParticleGenerator.h
+        src/game/BreakoutGame.cpp
+        include/game/BreakoutGame.h
 )
+
+target_include_directories(breakout PRIVATE include)
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # For Windows cross-compiling with MinGW-w64
@@ -43,16 +22,6 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
 else()
     # Native Linux build
     target_link_libraries(${PROJECT_NAME} PRIVATE
-            z
-            minizip
-            ${CMAKE_SOURCE_DIR}/lib/linux/libglfw3.a
-            #${CMAKE_SOURCE_DIR}/lib/linux/libassimp.a
-            OpenGL::GL  # Linux OpenGL target from find_package
-            dl
-            pthread
-            wayland-client
-            wayland-cursor
-            wayland-egl
-            xkbcommon
+            caffeine_gl
     )
 endif()

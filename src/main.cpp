@@ -1,16 +1,16 @@
 #include <iostream>
 #include <cmath>
 
-#include "glad/glad.h"
-#include "GLFW/glfw3.h"
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
 
-#include "game/Game.h"
-#include "gfx/ResourceManager.h"
+#include <game/BreakoutGame.h>
+#include <caffeine-gl/gfx/ResourceManager.h>
 
 int WIDTH;
 int HEIGHT;
 
-Game* Breakout;
+BreakoutGame* Breakout;
 
 bool testBool = false;
 
@@ -27,7 +27,7 @@ int main() {
 	WIDTH = videoMode->width;
 	HEIGHT = videoMode->height;
 
-	Breakout = new Game(WIDTH, HEIGHT);
+	Breakout = new BreakoutGame(WIDTH, HEIGHT);
 
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
