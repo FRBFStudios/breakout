@@ -16,8 +16,12 @@ target_include_directories(breakout PRIVATE include)
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # For Windows cross-compiling with MinGW-w64
     target_link_libraries(${PROJECT_NAME} PRIVATE
-            ${CMAKE_SOURCE_DIR}/lib/windows/libglfw3.a
-            opengl32  # Windows OpenGL library
+            caffeine_gl
+    )
+    target_link_options(breakout PRIVATE
+            -static
+            -static-libgcc
+            -static-libstdc++
     )
 else()
     # Native Linux build
@@ -25,3 +29,17 @@ else()
             caffeine_gl
     )
 endif()
+
+file(GLOB_RECURSE GAME_RESOURCES "${CMAKE_SOURCE_DIR}/resources/*")
+
+add_custom_target(copy_resources ALL
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        ${CMAKE_SOURCE_DIR}/resources
+        ${CMAKE_BINARY_DIR}/resources
+)
+
+add_dependencies(breakout copy_resources)
+
+target_compile_definitions(breakout PRIVATE
+        RESOURCE_PATH="${CMAKE_BINARY_DIR}/resources/"
+)

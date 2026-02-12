@@ -26,9 +26,9 @@ const float BALL_RADIUS = 25.0f;
 const glm::vec2 INITIAL_BALL_VELOCITY(100.0f, -350.0f);
 
 void BreakoutGame::Init() {
-	ResourceManager::LoadShader("src/shaders/default.vert", "src/shaders/default.frag",
+	ResourceManager::LoadShader((std::string(RESOURCE_PATH) + "shaders/default.vert").c_str(), (std::string(RESOURCE_PATH) + "shaders/default.frag").c_str(),
 		nullptr, "sprite");
-	ResourceManager::LoadShader("src/shaders/particle.vert", "src/shaders/particle.frag",
+	ResourceManager::LoadShader((std::string(RESOURCE_PATH) + "shaders/particle.vert").c_str(), (std::string(RESOURCE_PATH) + "shaders/particle.frag").c_str(),
 		nullptr, "defaultParticleShader");
 
 	glm::mat4 projectionMatrix = glm::ortho(0.0f, static_cast<float>(this->width),
