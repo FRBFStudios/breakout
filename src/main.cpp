@@ -75,7 +75,7 @@ int main() {
 		glfwSwapBuffers(window);
 	}
 	ResourceManager::Clear();
-	Breakout->~Game();
+	Breakout->~BreakoutGame();
 
 	glfwDestroyWindow(window);
 	glfwTerminate();
