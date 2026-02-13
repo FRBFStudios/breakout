@@ -11,8 +11,9 @@
   ];
 
   tasks = {
-     "build".exec = ''cmake -B build && cd build && make'';
-  #   "devenv:enterShell".after = [ "myproj:setup" ];
+     "breakout:build".exec = ''cmake -B build && cd build && make'';
+     "breakout:test".exec = ''./build/breakout'';  
+#   "devenv:enterShell".after = [ "myproj:setup" ];
   };
 
   # https://devenv.sh/tests/
