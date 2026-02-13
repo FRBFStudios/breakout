@@ -3,12 +3,12 @@
 {
   packages = with pkgs; [ 
      cmake
-     libGLU
-     zlib
-     minizip
-     wayland
-     libxkbcommon
-     glfw
+     #libGLU
+     #zlib
+     #minizip
+     #wayland
+     #libxkbcommon
+     #glfw
   ];
 
   tasks = {
