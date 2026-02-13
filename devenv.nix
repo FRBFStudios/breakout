@@ -3,12 +3,9 @@
 {
   packages = with pkgs; [ 
      cmake
-     #libGLU
-     #zlib
-     #minizip
-     #wayland
-     #libxkbcommon
-     #glfw
+     wayland
+     wayland-protocols
+     libxkbcommon
   ];
 
   tasks = {
