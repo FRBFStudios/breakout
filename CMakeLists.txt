@@ -13,20 +13,16 @@ add_executable(breakout
 
 target_include_directories(breakout PRIVATE include)
 
+target_link_libraries(${PROJECT_NAME} PRIVATE
+        caffeine_gl
+)
+
 if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
     # For Windows cross-compiling with MinGW-w64
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-            caffeine_gl
-    )
     target_link_options(breakout PRIVATE
             -static
             -static-libgcc
             -static-libstdc++
-    )
-else()
-    # Native Linux build
-    target_link_libraries(${PROJECT_NAME} PRIVATE
-            caffeine_gl
     )
 endif()
 

@@ -26,6 +26,7 @@ public:
 	SpriteRenderer* Renderer;
 	GameState state;
 	bool keys[1024];
+	bool processedKeys[1024];
 	unsigned int width, height;
 	std::vector<GameLevel> Levels;
 	Level activeLevel;

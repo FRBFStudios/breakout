@@ -10,9 +10,10 @@ BreakoutGame::BreakoutGame(unsigned int width, unsigned int height) {
 	this->width = width;
 	this->height = height;
 	this->state = GAME_ACTIVE;
-	this->activeLevel = STANDARD;
+	this->activeLevel = SPACE_INVADER;
 
-	std::fill(std::begin(this->keys), std::end(this->keys), false); // Initialize all keys to false
+	std::fill(std::begin(this->keys), std::end(this->keys), false);
+	std::fill(std::begin(this->processedKeys), std::end(this->processedKeys), false);
 }
 
 BreakoutGame::~BreakoutGame() {
@@ -57,17 +58,16 @@ void BreakoutGame::Init() {
 	BallTrail->SetPositionSpread(200);
 
 
-	GameLevel standard; standard.Load("resources/levels/standard.lvl", this->width, this->height / 2);
-	GameLevel gaps; gaps.Load("resources/levels/gaps.lvl", this->width, this->height / 2);
-	GameLevel space_invader; space_invader.Load("resources/levels/space_invader.lvl", this->width, this->height / 2);
-	GameLevel bounce_galore; bounce_galore.Load("resources/levels/bounce_galore.lvl", this->width, this->height / 2);
+	GameLevel standard; standard.Load((std::string(RESOURCE_PATH) + "levels/standard.lvl").c_str(), this->width, this->height / 2);
+	GameLevel gaps; gaps.Load((std::string(RESOURCE_PATH) + "levels/gaps.lvl").c_str(), this->width, this->height / 2);
+	GameLevel space_invader; space_invader.Load((std::string(RESOURCE_PATH) + "levels/space_invader.lvl").c_str(), this->width, this->height / 2);
+	GameLevel bounce_galore; bounce_galore.Load((std::string(RESOURCE_PATH) + "levels/bounce_galore.lvl").c_str(), this->width, this->height / 2);
 
 	this->Levels.push_back(standard);
 	this->Levels.push_back(gaps);
 	this->Levels.push_back(space_invader);
 	this->Levels.push_back(bounce_galore);
 
-	this->activeLevel = BOUNCE_GALORE;
 	this->state = GAME_ACTIVE;
 
 	glm::vec2 playerPos = glm::vec2(
@@ -110,6 +110,24 @@ void BreakoutGame::ProcessInput(float deltaTime) {
 				}
 			}
 		}
+		if(this->keys[GLFW_KEY_LEFT] && !this->processedKeys[GLFW_KEY_LEFT]) {
+			if(activeLevel != 0) {
+				activeLevel = static_cast<Level>(static_cast<int>(activeLevel) - 1);
+				ResetLevel();
+				ResetPlayer();
+			}
+			this->processedKeys[GLFW_KEY_LEFT] = true;
+		}
+
+		if(this->keys[GLFW_KEY_RIGHT] && !this->processedKeys[GLFW_KEY_RIGHT]) {
+			if(activeLevel != 3) {
+				activeLevel = static_cast<Level>(static_cast<int>(activeLevel) + 1);
+				ResetLevel();
+				ResetPlayer();
+			}
+			this->processedKeys[GLFW_KEY_RIGHT] = true;
+		}
+
 		if(this->keys[GLFW_KEY_SPACE]) {
 			Ball->stuck = false;
 		}

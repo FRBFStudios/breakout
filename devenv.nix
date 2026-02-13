@@ -8,6 +8,7 @@
      minizip
      wayland
      libxkbcommon
+     glfw
   ];
 
   tasks = {

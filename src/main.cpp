@@ -100,6 +100,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			Breakout->keys[key] = true;
 		} else if (action == GLFW_RELEASE) {
 			Breakout->keys[key] = false;
+			Breakout->processedKeys[key] = false;
 		}
 	}
 }
