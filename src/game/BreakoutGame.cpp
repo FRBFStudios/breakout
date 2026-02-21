@@ -50,7 +50,7 @@ void BreakoutGame::Init() {
 	ResourceManager::LoadTexture("resources/textures/block.png", false, "block");
 	ResourceManager::LoadTexture("resources/textures/block_solid.png", false, "block_solid");
 
-	BallTrail = new ParticleGenerator (250);
+	BallTrail = new ParticleGenerator (500);
 	BallTrail->SetShader(ResourceManager::GetShader("defaultParticleShader"));
 	BallTrail->SetTexture(ResourceManager::GetTexture("ball"));
 
