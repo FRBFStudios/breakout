@@ -1,4 +1,4 @@
-#version 460 core
+#version 410 core
 
 in vec2 textureCoords;
 in vec4 particleColor;

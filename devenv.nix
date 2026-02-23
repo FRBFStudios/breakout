@@ -6,13 +6,11 @@
      git
      pkg-config
      mesa
-     libGL
      libglvnd
      ] ++ lib.optionals stdenv.isLinux [
      wayland
      libffi
      libxkbcommon
-
      xorg.libX11
      xorg.libXcursor
      xorg.libXi
