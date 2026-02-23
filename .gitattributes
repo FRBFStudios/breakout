@@ -1,3 +1,5 @@
 include/** linguist-vendored
 
+src/glad.c linguist-vendored
+
 * text=auto
