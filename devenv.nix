@@ -8,9 +8,12 @@
      mesa
      libglvnd
      ] ++ lib.optionals stdenv.isLinux [
+     egl-wayland
      wayland
+     waylandpp
      libffi
      libxkbcommon
+
      xorg.libX11
      xorg.libXcursor
      xorg.libXi
@@ -23,6 +26,10 @@
      "breakout:test".exec = ''./build/breakout'';  
 #   "devenv:enterShell".after = [ "myproj:setup" ];
   };
+  enterShell = ''
+  '';
+
+  env.LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.wayland pkgs.libxkbcommon pkgs.egl-wayland pkgs.glfw pkgs.libffi ];
 
   # https://devenv.sh/tests/
   enterTest = ''

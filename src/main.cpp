@@ -21,7 +21,10 @@ void error_callback(int error, const char* description);
 int main() {
 	glfwSetErrorCallback(error_callback);
 
-	glfwInit();
+	if (!glfwInit()) {
+		std::cerr << "Could NOT initialize GLFW!" << std::endl;
+		return 1;
+	}
 
 	GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
 	const GLFWvidmode* videoMode = glfwGetVideoMode(primaryMonitor);
