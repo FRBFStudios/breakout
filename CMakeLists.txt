@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.31)
 project(breakout)
 
-set(CMAKE_CXX_STANDARD 17)
-
 add_subdirectory(caffeine-gl)
 
 add_executable(breakout
@@ -11,24 +9,17 @@ add_executable(breakout
         include/game/BreakoutGame.h
 )
 
-target_include_directories(breakout PRIVATE include)
+target_compile_features(breakout PRIVATE cxx_std_17)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE
+target_include_directories(breakout PRIVATE
+        include
+)
+
+target_link_libraries(breakout PRIVATE
         caffeine_gl
 )
 
-if (CMAKE_SYSTEM_NAME STREQUAL "Windows")
-    # For Windows cross-compiling with MinGW-w64
-    target_link_options(breakout PRIVATE
-            -static
-            -static-libgcc
-            -static-libstdc++
-    )
-endif()
-
-file(GLOB_RECURSE GAME_RESOURCES "${CMAKE_SOURCE_DIR}/resources/*")
-
-add_custom_target(copy_resources ALL
+add_custom_target(copy_resources
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         ${CMAKE_SOURCE_DIR}/resources
         ${CMAKE_BINARY_DIR}/resources

@@ -16,9 +16,11 @@ bool testBool = false;
 
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode);
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
-
+void error_callback(int error, const char* description);
 
 int main() {
+	glfwSetErrorCallback(error_callback);
+
 	glfwInit();
 
 	GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
@@ -103,4 +105,8 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			Breakout->processedKeys[key] = false;
 		}
 	}
+}
+
+void error_callback(int error, const char* description) {
+	std::cerr << "GLFW Error: " << description << std::endl;
 }

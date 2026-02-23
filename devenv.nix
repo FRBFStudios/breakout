@@ -3,13 +3,25 @@
 {
   packages = with pkgs; [ 
      cmake
+     git
+     pkg-config
+     mesa
+     libGL
+     libglvnd
+     ] ++ lib.optionals stdenv.isLinux [
      wayland
-     wayland-protocols
+     libffi
      libxkbcommon
+
+     xorg.libX11
+     xorg.libXcursor
+     xorg.libXi
+     xorg.libXrandr
+     xorg.libXinerama
   ];
 
   tasks = {
-     "breakout:build".exec = ''cmake -B build && cd build && make'';
+     "breakout:build".exec = ''cmake -B build && cmake --build build'';
      "breakout:test".exec = ''./build/breakout'';  
 #   "devenv:enterShell".after = [ "myproj:setup" ];
   };
