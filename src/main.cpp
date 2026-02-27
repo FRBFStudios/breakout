@@ -5,7 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include <game/BreakoutGame.h>
-#include <caffeine-gl/gfx/ResourceManager.h>
+#include <caffeine-gl/base.h>
 
 int WIDTH;
 int HEIGHT;
